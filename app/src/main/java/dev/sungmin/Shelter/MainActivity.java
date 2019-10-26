@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private boolean TrackingMode = true;
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
+    private static String TMapAPIKey = "앱키";
     private ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
 
 
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.linearLayoutTmap);
         tMapView = new TMapView(this);
         //발급 받은 API키  보안상 문제로 인하여 깃허브 커밋시 지워서 커밋할것!
-        tMapView.setSKTMapApiKey("API키");
+        tMapView.setSKTMapApiKey(TMapAPIKey);
         linearLayoutTmap.addView(tMapView);
 
         addPoint();
@@ -51,11 +52,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         /*현 위치 아이콘 설정*/
         tMapView.setIconVisibility(true);
 
+        tMapView.setZoomLevel(15);
+        tMapView.setMapType(TMapView.MAPTYPE_STANDARD);
+        tMapView.setLanguage(TMapView.LANGUAGE_KOREAN);
+
         tmapgps = new TMapGpsManager(MainActivity.this);
         tmapgps.setMinTime(1000);
         tmapgps.setMinDistance(5);
         tmapgps.setProvider(tmapgps.NETWORK_PROVIDER); //네트워크에서 가져옴
-        tmapgps.setProvider(tmapgps.GPS_PROVIDER); //GPS에서 가져옴
         tmapgps.OpenGps();
 
         tMapView.setTrackingMode(true);
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         mapPoints.add(new MapPoint("인문관",36.79880615906803, 127.07584122804188));
         mapPoints.add(new MapPoint("탕정중",36.8020487, 127.0651313));
         mapPoints.add(new MapPoint("체육관",36.7995895, 127.0710061));
+        mapPoints.add(new MapPoint("성민 ",37.457361, 126.882623));
     }
 
     public void MarkerPoint(){
