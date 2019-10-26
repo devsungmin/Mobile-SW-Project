@@ -97,12 +97,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     //button click event
     @Override
     public void onClick(View view) {
-        if(view == buttonSignup) {
+        if(view.getId() == R.id.buttonSignup) {
             //TODO
             registerUser();
         }
 
-        if(view == textviewSignin) {
+        if(view.getId() == R.id.textViewSignin) {
             //TODO
             startActivity(new Intent(this, LoginActivity.class)); //추가해 줄 로그인 액티비티
         }
