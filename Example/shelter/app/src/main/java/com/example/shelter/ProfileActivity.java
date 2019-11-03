@@ -43,7 +43,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         firebaseAuth = FirebaseAuth.getInstance();
         //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
         if(firebaseAuth.getCurrentUser() == null) {
-            finish();
+            //finish();
             startActivity(new Intent(this, LoginActivity.class));
         }
 
