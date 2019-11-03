@@ -11,7 +11,6 @@ import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPoint;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
-import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private boolean TrackingMode = true;
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
-    private static String TMapAPIKey = "앱키";
+    private static String TMapAPIKey = "앱";
     private static String DataAPIKEY = "API키";
     private ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
 
@@ -98,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         boolean bfacility_name = false, bsisul_rddr = false, bsisul_addr = false, blongitude = false, blatitude = false, bshelter_psbl = false;
 
         StrictMode.enableDefaults();
-        BufferedReader br = null;
+        StringBuffer buffer = new StringBuffer();
         try{
             String urlstr = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + DataAPIKEY;
             URL url = new URL(urlstr);
@@ -113,23 +112,45 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             urlconnection.setRequestMethod("GET");
 //            br = new BufferedReader(new InputStreamReader(urlconnection.getInputStream(),"UTF-8"));
 
-            while((eventType != XmlPullParser.END_DOCUMENT) {
+            while((eventType != XmlPullParser.END_DOCUMENT)) {
                 if (eventType == XmlPullParser.START_DOCUMENT) {
-                    ;
                 } else if (eventType == XmlPullParser.START_TAG) {
                     String tag = xpp.getName();
                     if (tag.equals("facility_name")) { //대피소 이름
+                        buffer.append("이름 : ");
+                        buffer.append(xpp.getText());
                         bfacility_name = true;
+                        xpp.next();
+                        buffer.append(xpp.getText());
+                        buffer.append("\n");
                     } else if (tag.equals("sisul_rddr")) { //대피소 도로명 주소
+                        buffer.append("도로명 주소 : ");
+                        buffer.append(xpp.getText());
                         bsisul_rddr = true;
+                        xpp.next();
+                        buffer.append("\n");
                     } else if (tag.equals("sisul_addr")) { //대피소 번지명 주소
+                        buffer.append("번지명 주소 : ");
+                        buffer.append(xpp.getText());
                         bsisul_addr = true;
+                        xpp.next();
+                        buffer.append("\n");
                     } else if (tag.equals("longitude")) { //위도
                         blongitude = true;
+                        xpp.next();
+                        buffer.append(xpp.getText());
+                        buffer.append("\n");
                     } else if (tag.equals("latitude")) { //경도
                         blatitude = true;
+                        xpp.next();
+                        buffer.append(xpp.getText());
+                        buffer.append("\n");
                     } else if (tag.equals("shelter_psbl")) { //수용 인원
+                        buffer.append("수용인원 : ");
+                        buffer.append(xpp.getText());
                         bshelter_psbl = true;
+                        xpp.next();
+                        buffer.append("\n");
                     }
                 }
             }
