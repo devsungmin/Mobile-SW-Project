@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="20dp"
     tools:context=".WriteActivity">
 
 
@@ -30,7 +31,7 @@
             <EditText
                 android:id="@+id/content"
                 android:layout_width="match_parent"
-                android:layout_height="579dp"
+                android:layout_height="537dp"
                 android:ems="10"
                 android:hint="내용"
                 android:inputType="textPersonName" />
