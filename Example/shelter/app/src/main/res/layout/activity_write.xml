@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".WriteActivity">
+    android:layout_height="match_parent">
 
 
     <RelativeLayout
@@ -29,7 +28,7 @@
             <EditText
                 android:id="@+id/content"
                 android:layout_width="match_parent"
-                android:layout_height="587dp"
+                android:layout_height="200dp"
                 android:ems="10"
                 android:hint="내용"
                 android:inputType="textPersonName"/>
