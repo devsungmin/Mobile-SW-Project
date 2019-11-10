@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tmapgps.setMinTime(1000);
         tmapgps.setMinDistance(5);
         tmapgps.setProvider(tmapgps.NETWORK_PROVIDER); //네트워크에서 가져옴
-//        tmapgps.OpenGps();
+        tmapgps.OpenGps();
 
         tMapView.setTrackingMode(true);
         tMapView.setSightVisible(true);

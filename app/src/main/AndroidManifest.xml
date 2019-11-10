@@ -11,7 +11,7 @@
         android:allowBackup="true"
         android:icon="@drawable/emergency_exit"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/emergency_exit"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
