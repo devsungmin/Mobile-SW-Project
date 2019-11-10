@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">내 주변 대피소 찾기</string>
+    <string name="app_name">내 주변\n대피소 찾기</string>
     <string name="title_activity_login">로그인</string>
     <string name="prompt_email">ID</string>
     <string name="prompt_password">Password</string>
