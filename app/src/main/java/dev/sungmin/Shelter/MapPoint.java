@@ -1,16 +1,18 @@
 package dev.sungmin.Shelter;
 
 public class MapPoint {
-    private String Name;
-    private double  latitude;
-    private  double longitude;
+    private String Name; //대피소 이름
+    private String sisul_rddr; //도로명 주소
+    private double  latitude; //위도
+    private  double longitude; //경도
 
     public MapPoint() {
         super();
     }
 
-    public  MapPoint(String Name, double latitude, double longitude) {
+    public  MapPoint(String Name, String sisul_rddr, double latitude, double longitude) {
         this.Name = Name;
+        this.sisul_rddr = sisul_rddr;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -21,6 +23,13 @@ public class MapPoint {
 
     public void setName(String Name){
         this.Name = Name;
+    }
+
+    public String getSisul_rddr() {
+        return sisul_rddr;
+    }
+    public  void setSisul_rddr(String sisul_rddr) {
+        this.sisul_rddr = sisul_rddr;
     }
 
     public double getLatitude() {

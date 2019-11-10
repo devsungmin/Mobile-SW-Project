@@ -83,6 +83,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 markerItem1.setPosition(0.5f, 1.0f);
                 markerItem1.setTMapPoint(point);
                 markerItem1.setName(entity.getName());
+
+                /* 마커 풍선창 이벤트 */
+                markerItem1.setCanShowCallout(true);
+                markerItem1.setCalloutTitle(mapPoint.get(i).getName());
+                markerItem1.setCalloutSubTitle("도로명 주소 : " + mapPoint.get(i).getSisul_rddr());
+
                 tMapView.setCenterPoint(mapPoint.get(i).getLongitude(), mapPoint.get(i).getLatitude());
                 tMapView.addMarkerItem("markerItem1" + i, markerItem1);
             }

@@ -32,8 +32,8 @@ public class ShelterApi {
 
         ArrayList<MapPoint> mapPoint = new ArrayList<MapPoint>();
 
-        String facility_name = null, longitude= null,latitude=null;
-        boolean bfacility_name = false, blatitude = false, blongitude = false;
+        String facility_name = null, longitude = null,latitude = null, sisul_rddr = null;
+        boolean bfacility_name = false, blatitude = false, blongitude = false, bsisul_rddr = false;
 
         while (event_type != XmlPullParser.END_DOCUMENT) {
             if (event_type == XmlPullParser.START_TAG) {
@@ -41,17 +41,23 @@ public class ShelterApi {
                 if(tag.equals("facility_name")) {
                     bfacility_name = true;
                 }
+                if(tag.equals("sisul_rddr")) {
+                    bsisul_rddr = true;
+                }
                 if(tag.equals("latitude")) {
                     blatitude = true;
                 }
-                if(tag.equals("longitude")){
+                if(tag.equals("longitude")) {
                     blongitude = true;
                 }
             } else if (event_type == XmlPullParser.TEXT) {
                 if(bfacility_name == true){
                     facility_name = xpp.getText();
                     bfacility_name = false;
-                } else if(blatitude == true){
+                } else if(bsisul_rddr == true) {
+                    sisul_rddr = xpp.getText();
+                    bsisul_rddr = false;
+                }else if(blatitude == true){
                     latitude = xpp.getText();
                     blatitude = false;
                 }else if(blongitude ==true){
@@ -63,21 +69,20 @@ public class ShelterApi {
                 if (tag.equals("row")) {
                     MapPoint entity = new MapPoint();
                     entity.setName(facility_name);
+                    entity.setSisul_rddr(sisul_rddr);
                     entity.setLatitude(Double.valueOf(latitude));
                     entity.setLongitude(Double.valueOf(longitude));
                     mapPoint.add(entity);
-                    System.out.println(mapPoint.size());
                 }
             }
             event_type = xpp.next();
         }
-        System.out.println(mapPoint.size());
 
         return mapPoint;
     }
 
     private String getURLParam(String search){
-        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=300&flag=Y";
+        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=1000&flag=Y";
         return url;
     }
 
