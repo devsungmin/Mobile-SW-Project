@@ -28,6 +28,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
             }
         });
@@ -35,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(HomeActivity.this, RegisterActivity.class));
             }
         });
@@ -42,6 +44,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(HomeActivity.this, BoardActivity.class));
             }
         });
@@ -49,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(HomeActivity.this, WriteActivity.class));
             }
         });
@@ -56,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
             }
         });

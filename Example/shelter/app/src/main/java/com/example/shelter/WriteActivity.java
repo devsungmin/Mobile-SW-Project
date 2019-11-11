@@ -64,6 +64,7 @@ public class WriteActivity extends Activity implements View.OnClickListener{
         String title = editText1.getText().toString().trim();
         String content = editText2.getText().toString().trim();
         String nickname = email[0];
+        String b_key;
         int goodCount = 0;
         //title과 content가 비었는지 아닌지를 체크 한다.
         if(TextUtils.isEmpty(title)){
@@ -81,9 +82,10 @@ public class WriteActivity extends Activity implements View.OnClickListener{
 
         SimpleDateFormat dateform = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
-        Board board=new Board(title,dateform.format(date).toString(),content,nickname,goodCount);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         String key = mDatabase.child("board").push().getKey();
+        b_key=key;
+        Board board=new Board(title,dateform.format(date).toString(),content,nickname,goodCount,b_key);
         Map<String, Object> boardValues = board.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/board/"+key,boardValues);

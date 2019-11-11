@@ -22,6 +22,7 @@
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".WriteActivity"/>
         <activity android:name=".BoardActivity"/>
+        <activity android:name=".BoardDetailAcitivity" />
 
     </application>
 

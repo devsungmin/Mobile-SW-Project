@@ -9,6 +9,16 @@ public class Board{
     public String date;
     public String content;
     public String nickname;
+    public String b_key;
+
+    public String getKey() {
+        return b_key;
+    }
+
+    public void setKey(String key) {
+        this.b_key = b_key;
+    }
+
     public int goodCount = 0;
 
 
@@ -32,12 +42,13 @@ public class Board{
 
     public Board(){}
 
-    Board(String title,String date,String content,String nickname,int goodCount){
+    Board(String title,String date,String content,String nickname,int goodCount,String b_key){
         this.title=title;
         this.date=date;
         this.content=content;
         this.nickname=nickname;
         this.goodCount=goodCount;
+        this.b_key=b_key;
     }
     public String getTitle(){
         return title;
@@ -79,6 +90,7 @@ public class Board{
         result.put("nickname",nickname);
         result.put("goodCount",goodCount);
         result.put("good",good);
+        result.put("b_key",b_key);
         return result;
     }
 
