@@ -5,20 +5,34 @@ package dev.sungmin.Shelter;
         import androidx.core.content.ContextCompat;
 
         import android.Manifest;
+        import android.content.Context;
         import android.content.pm.PackageManager;
+        import android.graphics.Bitmap;
+        import android.graphics.BitmapFactory;
+        import android.graphics.PointF;
+        import android.graphics.drawable.BitmapDrawable;
+        import android.location.LocationListener;
+        import android.location.LocationManager;
         import android.os.Build;
         import android.os.Bundle;
         import android.os.StrictMode;
+        import android.view.View;
+        import android.widget.Button;
         import android.widget.LinearLayout;
         import android.location.Location;
         import android.widget.Toast;
 
+        import com.skt.Tmap.TMapData;
         import com.skt.Tmap.TMapGpsManager;
+        import com.skt.Tmap.TMapPOIItem;
+        import com.skt.Tmap.TMapPolyLine;
         import com.skt.Tmap.TMapView;
         import com.skt.Tmap.TMapMarkerItem;
         import com.skt.Tmap.TMapPoint;
 
         import java.util.ArrayList;
+
+        import static android.graphics.Color.RED;
 
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
@@ -27,7 +41,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private boolean TrackingMode = true;
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
+    private Location lastKnownLocation =null;
     private static String TMapAPIKey = "앱";
+    private double longitude,latitude,longitude2,latitude2;
+
 
     @Override
     public void onLocationChange(Location location) {
@@ -35,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             tMapView.setLocationPoint(location.getLongitude(), location.getLatitude());
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +59,17 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+
+        //네트워크 좌표값 설정
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        lm.removeUpdates(locationListener);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        }
+        lm.requestLocationUpdates("network", 0, 0, locationListener);
 
         // 안드로이드 6.0 이상일 경우 퍼미션 체크
         if (Build.VERSION.SDK_INT >= 23) {
@@ -57,7 +84,26 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         linearLayoutTmap.addView(tMapView);
 
         setUpMap();
+        Button navi =findViewById(R.id.navi);
+        navi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                TMapPoint tMapPointStart = new TMapPoint(latitude,longitude); // SKT타워(출발지)
+                TMapPoint tMapPointEnd = new TMapPoint(latitude2, longitude2); // N서울타워(목적지)
+                try {
+                    TMapPolyLine tMapPolyLine = new TMapData().findPathData(tMapPointStart, tMapPointEnd);
+                    tMapPolyLine.setLineColor(RED);
+                    tMapPolyLine.setLineWidth(2);
+                    tMapView.addTMapPolyLine("Line1", tMapPolyLine);
+
+                }catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
         /*현재 보는 방향으로 설정*/
         tMapView.setCompassMode(true);
 
@@ -76,6 +122,17 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
         tMapView.setTrackingMode(true);
         tMapView.setSightVisible(true);
+
+        tMapView.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback() {
+            @Override
+            public void onCalloutRightButton(TMapMarkerItem markerItem) {
+                latitude2 = markerItem.latitude;
+                longitude2 = markerItem.longitude;
+                //Toast.makeText(MainActivity.this,"tlqkf",Toast.LENGTH_SHORT).show();
+                // 마커 오른쪽 버튼클릭이벤트처리
+            }
+        });
+
     }
 
     private boolean checkPermissions() {
@@ -107,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         for (int i = 0; i < mapPoint.size(); i++) {
             for (MapPoint entity : mapPoint) {
                 TMapPoint point = new TMapPoint(mapPoint.get(i).getLatitude(), mapPoint.get(i).getLongitude());
-                TMapMarkerItem markerItem1 = new TMapMarkerItem();
+                final TMapMarkerItem markerItem1 = new TMapMarkerItem();
 
                 markerItem1.setPosition(0.5f, 1.0f);
                 markerItem1.setTMapPoint(point);
@@ -118,9 +175,35 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 markerItem1.setCalloutTitle(mapPoint.get(i).getName());
                 markerItem1.setCalloutSubTitle(mapPoint.get(i).getSisul_rddr());
 
+                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.kkk);           // 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
+                Bitmap b=bitmapdraw.getBitmap();                                                                    // 비트맵 선언
+                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+
+
+                markerItem1.setCalloutRightButtonImage(smallMarker);
+
                 tMapView.setCenterPoint(mapPoint.get(i).getLongitude(), mapPoint.get(i).getLatitude());
                 tMapView.addMarkerItem("markerItem1" + i, markerItem1);
             }
         }
     }
+    public LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+            // Get the last location, and update UI
+            lastKnownLocation = location;
+             longitude=lastKnownLocation.getLongitude();
+             latitude=lastKnownLocation.getLatitude();
+            lm.removeUpdates(this);
+        }
+        @Override
+        public void onProviderDisabled(String provider) {}
+        @Override
+        public void onProviderEnabled(String provider) {}
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {} };
+
+
+
 }
