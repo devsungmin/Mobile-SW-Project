@@ -32,8 +32,9 @@ public class ShelterApi {
 
         ArrayList<MapPoint> mapPoint = new ArrayList<MapPoint>();
 
-        String facility_name = null, longitude = null,latitude = null, sisul_rddr = null;
-        boolean bfacility_name = false, blatitude = false, blongitude = false, bsisul_rddr = false;
+        /* 이름, 경도, 위도, 도로명주소, 법정동 주소코드 */
+        String facility_name = null, longitude = null,latitude = null, sisul_rddr = null, b_addr_cd = null;
+        boolean bfacility_name = false, blatitude = false, blongitude = false, bsisul_rddr = false, bb_addr_cd = false;
 
         while (event_type != XmlPullParser.END_DOCUMENT) {
             if (event_type == XmlPullParser.START_TAG) {
@@ -50,6 +51,9 @@ public class ShelterApi {
                 if(tag.equals("longitude")) {
                     blongitude = true;
                 }
+                if(tag.equals("b_addr_cd")) {
+                    bb_addr_cd = true;
+                }
             } else if (event_type == XmlPullParser.TEXT) {
                 if(bfacility_name == true){
                     facility_name = xpp.getText();
@@ -63,6 +67,10 @@ public class ShelterApi {
                 }else if(blongitude ==true){
                     longitude = xpp.getText();
                     blongitude = false;
+                } else  if(bb_addr_cd == true) {
+                    b_addr_cd = xpp.getText();
+                    System.out.println(b_addr_cd);
+                    bb_addr_cd = false;
                 }
             } else if (event_type == XmlPullParser.END_TAG) {
                 tag = xpp.getName();
@@ -72,6 +80,7 @@ public class ShelterApi {
                     entity.setSisul_rddr(sisul_rddr);
                     entity.setLatitude(Double.valueOf(latitude));
                     entity.setLongitude(Double.valueOf(longitude));
+                    entity.setBAddrCd(Double.valueOf(b_addr_cd));
                     mapPoint.add(entity);
                 }
             }
@@ -82,7 +91,7 @@ public class ShelterApi {
     }
 
     private String getURLParam(String search){
-        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=1000&flag=Y";
+        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=300&flag=Y";
         return url;
     }
 

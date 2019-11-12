@@ -1,10 +1,17 @@
 package dev.sungmin.Shelter;
 
         import androidx.appcompat.app.AppCompatActivity;
+        import androidx.core.app.ActivityCompat;
+        import androidx.core.content.ContextCompat;
+
+        import android.Manifest;
+        import android.content.pm.PackageManager;
+        import android.os.Build;
         import android.os.Bundle;
         import android.os.StrictMode;
         import android.widget.LinearLayout;
         import android.location.Location;
+        import android.widget.Toast;
 
         import com.skt.Tmap.TMapGpsManager;
         import com.skt.Tmap.TMapView;
@@ -16,6 +23,7 @@ package dev.sungmin.Shelter;
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
 
+    private static final int MY_PERMISSIONS_REQUEST = 1000;
     private boolean TrackingMode = true;
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
@@ -36,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        // 안드로이드 6.0 이상일 경우 퍼미션 체크
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkPermissions();
+        }
 
         LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.linearLayoutTmap);
         tMapView = new TMapView(this);
@@ -66,6 +78,23 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setSightVisible(true);
     }
 
+    private boolean checkPermissions() {
+        /* 파일 접근 권한 체크 */
+        int CheckFLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int CheckCLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        if (CheckFLocation != PackageManager.PERMISSION_GRANTED && CheckCLocation != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "권한 승인이 필요합니다", Toast.LENGTH_LONG).show();
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST);
+                Toast.makeText(this, "사용자위치를 받아오기 위해 GPS 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+            }
+            return false;
+        }
+        return true;
+    }
 
     private void setUpMap() {
         ShelterApi parser = new ShelterApi();
