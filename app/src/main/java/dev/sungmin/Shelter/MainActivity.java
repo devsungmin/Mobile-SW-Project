@@ -16,6 +16,8 @@ package dev.sungmin.Shelter;
         import android.os.Build;
         import android.os.Bundle;
         import android.os.StrictMode;
+        import android.view.Menu;
+        import android.view.MenuItem;
         import android.view.View;
         import android.widget.Button;
         import android.widget.LinearLayout;
@@ -41,10 +43,17 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private boolean TrackingMode = true;
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
-    private Location lastKnownLocation =null;
+    private Location lastKnownLocation = null;
     private static String TMapAPIKey = "앱";
-    private double longitude,latitude,longitude2,latitude2;
+    private double longitude, latitude, longitude2, latitude2;
 
+    /* 메뉴 바 */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+
+        return true;
+    }
 
     @Override
     public void onLocationChange(Location location) {
@@ -52,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             tMapView.setLocationPoint(location.getLongitude(), location.getLatitude());
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,12 +94,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         linearLayoutTmap.addView(tMapView);
 
         setUpMap();
-        Button navi =findViewById(R.id.navi);
+        Button navi = findViewById(R.id.navi);
         navi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                TMapPoint tMapPointStart = new TMapPoint(latitude,longitude); // SKT타워(출발지)
+                TMapPoint tMapPointStart = new TMapPoint(latitude, longitude); // SKT타워(출발지)
                 TMapPoint tMapPointEnd = new TMapPoint(latitude2, longitude2); // N서울타워(목적지)
                 try {
                     TMapPolyLine tMapPolyLine = new TMapData().findPathData(tMapPointStart, tMapPointEnd);
@@ -97,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                     tMapPolyLine.setLineWidth(2);
                     tMapView.addTMapPolyLine("Line1", tMapPolyLine);
 
-                }catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -128,8 +138,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             public void onCalloutRightButton(TMapMarkerItem markerItem) {
                 latitude2 = markerItem.latitude;
                 longitude2 = markerItem.longitude;
-                //Toast.makeText(MainActivity.this,"tlqkf",Toast.LENGTH_SHORT).show();
-                // 마커 오른쪽 버튼클릭이벤트처리
             }
         });
 
@@ -141,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         int CheckCLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
 
         if (CheckFLocation != PackageManager.PERMISSION_GRANTED && CheckCLocation != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "권한 승인이 필요합니다", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "권한 승인이 필요합니다", Toast.LENGTH_LONG).show();
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST);
@@ -175,8 +183,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 markerItem1.setCalloutTitle(mapPoint.get(i).getName());
                 markerItem1.setCalloutSubTitle(mapPoint.get(i).getSisul_rddr());
 
-                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.kkk);           // 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
-                Bitmap b=bitmapdraw.getBitmap();                                                                    // 비트맵 선언
+                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.kkk);           // 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
+                Bitmap b = bitmapdraw.getBitmap();                                                                    // 비트맵 선언
                 Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
 
 
@@ -187,23 +195,44 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
         }
     }
+
+    /* 메뉴바 선택 */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_btn1:
+                //게시판
+                return true;
+            case R.id.action_btn2:
+                //개발자
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             // Get the last location, and update UI
             lastKnownLocation = location;
-             longitude=lastKnownLocation.getLongitude();
-             latitude=lastKnownLocation.getLatitude();
+            longitude = lastKnownLocation.getLongitude();
+            latitude = lastKnownLocation.getLatitude();
             lm.removeUpdates(this);
         }
-        @Override
-        public void onProviderDisabled(String provider) {}
-        @Override
-        public void onProviderEnabled(String provider) {}
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {} };
 
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
 
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
 
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+    };
 }

@@ -91,7 +91,7 @@ public class ShelterApi {
     }
 
     private String getURLParam(String search){
-        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=300&flag=Y";
+        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=100&flag=Y";
         return url;
     }
 
