@@ -1,41 +1,40 @@
 package dev.sungmin.Shelter;
 
-        import androidx.appcompat.app.AppCompatActivity;
-        import androidx.core.app.ActivityCompat;
-        import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-        import android.Manifest;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.content.pm.PackageManager;
-        import android.graphics.Bitmap;
-        import android.graphics.BitmapFactory;
-        import android.graphics.PointF;
-        import android.graphics.drawable.BitmapDrawable;
-        import android.location.LocationListener;
-        import android.location.LocationManager;
-        import android.os.Build;
-        import android.os.Bundle;
-        import android.os.StrictMode;
-        import android.view.Menu;
-        import android.view.MenuItem;
-        import android.view.View;
-        import android.widget.Button;
-        import android.widget.LinearLayout;
-        import android.location.Location;
-        import android.widget.Toast;
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.location.Location;
+import android.widget.Toast;
 
-        import com.skt.Tmap.TMapData;
-        import com.skt.Tmap.TMapGpsManager;
-        import com.skt.Tmap.TMapPOIItem;
-        import com.skt.Tmap.TMapPolyLine;
-        import com.skt.Tmap.TMapView;
-        import com.skt.Tmap.TMapMarkerItem;
-        import com.skt.Tmap.TMapPoint;
+import com.skt.Tmap.TMapData;
+import com.skt.Tmap.TMapGpsManager;
+import com.skt.Tmap.TMapPolyLine;
+import com.skt.Tmap.TMapTapi;
+import com.skt.Tmap.TMapView;
+import com.skt.Tmap.TMapMarkerItem;
+import com.skt.Tmap.TMapPoint;
 
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
-        import static android.graphics.Color.RED;
+import static android.graphics.Color.RED;
 
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
@@ -45,8 +44,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
     private Location lastKnownLocation = null;
-    private static String TMapAPIKey = "APIKEY";
+    private static String TMapAPIKey = "api키";
     private double longitude, latitude, longitude2, latitude2;
+    private  String tmapid;
+
 
     /* 메뉴 바 */
     @Override
@@ -115,6 +116,25 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
             }
         });
+        Button tmapnavi =findViewById(R.id.tmapnavi);
+        tmapnavi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TMapTapi tMapTapi = new TMapTapi( MainActivity.this);
+                boolean isTmapApp = tMapTapi.isTmapApplicationInstalled();
+                if(isTmapApp) {
+                    System.out.println((float) latitude2+","+(float) longitude2);
+                    tMapTapi.invokeRoute(tmapid,(float) longitude2,(float) latitude2);
+                    tMapTapi.invokeTmap();
+                }
+                else {
+                    Intent i = new Intent(android.content.Intent.ACTION_VIEW);
+                    i.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.skt.tmap.ku&hl=ko"));
+                    startActivity(i);
+
+                }
+            }
+        });
         /*현재 보는 방향으로 설정*/
         tMapView.setCompassMode(true);
 
@@ -137,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setOnCalloutRightButtonClickListener(new TMapView.OnCalloutRightButtonClickCallback() {
             @Override
             public void onCalloutRightButton(TMapMarkerItem markerItem) {
+                tmapid = markerItem.getCalloutTitle();
                 latitude2 = markerItem.latitude;
                 longitude2 = markerItem.longitude;
             }
@@ -184,9 +205,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 markerItem1.setCalloutTitle(mapPoint.get(i).getName());
                 markerItem1.setCalloutSubTitle(mapPoint.get(i).getSisul_rddr());
 
-                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.kkk);           // 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
+                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.point);           // 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
                 Bitmap b = bitmapdraw.getBitmap();                                                                    // 비트맵 선언
-                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 70, 70, false);
 
 
                 markerItem1.setCalloutRightButtonImage(smallMarker);
