@@ -24,6 +24,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".RegisterActivity"/>
+        <activity android:name=".LoginActivity"/>
+        <activity android:name=".HomeActivity"/>
+        <activity android:name=".FindActivity"/>
+        <activity android:name=".ProfileActivity"/>
+        <activity android:name=".WriteActivity"/>
+        <activity android:name=".BoardActivity"/>
+        <activity android:name=".BoardDetailAcitivity" />
+        <activity android:name=".PopupActivity" android:theme="@android:style/Theme.Dialog" />
     </application>
 
 </manifest>

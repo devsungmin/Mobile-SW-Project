@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class ShelterApi {
-    private static String ServiceKey = "API키";
+    private static String ServiceKey = "APIKEY";
     public ShelterApi() {
         try {
             apiParserSearch();

@@ -6,6 +6,7 @@ package dev.sungmin.Shelter;
 
         import android.Manifest;
         import android.content.Context;
+        import android.content.Intent;
         import android.content.pm.PackageManager;
         import android.graphics.Bitmap;
         import android.graphics.BitmapFactory;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
     private Location lastKnownLocation = null;
-    private static String TMapAPIKey = "앱";
+    private static String TMapAPIKey = "APIKEY";
     private double longitude, latitude, longitude2, latitude2;
 
     /* 메뉴 바 */
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
         // 안드로이드 6.0 이상일 경우 퍼미션 체크
         if (Build.VERSION.SDK_INT >= 23) {
-            checkPermissions();
+            //checkPermissions();
         }
 
         LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.linearLayoutTmap);
@@ -203,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         switch (item.getItemId()) {
             case R.id.action_btn1:
                 //게시판
+                finish();
+                startActivity(new Intent(MainActivity.this,BoardActivity.class));
                 return true;
             case R.id.action_btn2:
                 //개발자
