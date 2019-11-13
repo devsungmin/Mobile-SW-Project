@@ -80,7 +80,7 @@ public class WriteActivity extends Activity implements View.OnClickListener{
         progressDialog.setMessage("글을 작성중 입니다. 기다려주세요...");
         progressDialog.show();
 
-        SimpleDateFormat dateform = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateform = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date date = new Date();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         String key = mDatabase.child("board").push().getKey();
@@ -95,6 +95,7 @@ public class WriteActivity extends Activity implements View.OnClickListener{
         progressDialog.dismiss();
         Toast.makeText(this,"글을 작성했습니다.",Toast.LENGTH_SHORT).show();
         finish();
+        startActivity(new Intent(WriteActivity.this, BoardActivity.class));
 
 
 
@@ -108,6 +109,7 @@ public class WriteActivity extends Activity implements View.OnClickListener{
             writeBoard();
         }
         if(v.getId() == R.id.cancel){
+            finish();
             startActivity(new Intent(WriteActivity.this, BoardActivity.class));
         }
     }

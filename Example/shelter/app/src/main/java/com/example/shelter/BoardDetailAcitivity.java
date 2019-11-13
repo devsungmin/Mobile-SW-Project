@@ -1,12 +1,14 @@
 package com.example.shelter;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,7 +36,10 @@ import java.util.Map;
 public class BoardDetailAcitivity extends Activity implements View.OnClickListener{
     private static final String TAG = "BoardDetailActivity";
     public static final String EXTRA_BOARD_KEY = "board_key";
+    public static final String NICKNAME="nickname";
     String []email;
+    String nickname_,nick;
+    String com_nick;
     private FirebaseAuth firebaseAuth;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -42,10 +47,11 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
     private ArrayList<Comment> arrayList;
     private ValueEventListener mboardListener;
     private FirebaseDatabase database;
-    private DatabaseReference boardReference,commentReference;
-    private TextView titleView,contentView,dateView,nicknameView,goodcountView;
+    private DatabaseReference boardReference,commentReference,deleteReference,comdelReference;
+    private TextView titleView,contentView,dateView,nicknameView,goodcountView,deleteView;
     private EditText commentView;
     private Button button;
+    String CommentKey;
     String BoardKey;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,8 +65,27 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         dateView = findViewById(R.id.date);
         nicknameView = findViewById(R.id.nickname);
         goodcountView = findViewById(R.id.goodcount);
-
+        deleteView = findViewById(R.id.delete);
+        firebaseAuth = FirebaseAuth.getInstance();
+        //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
+        if(firebaseAuth.getCurrentUser() == null) {
+            finish();
+            startActivity(new Intent(BoardDetailAcitivity.this, LoginActivity.class));
+        }
+        //유저가 있다면, null이 아니면 계속 진행
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        email = user.getEmail().split("@");
+        nick=email[0];
+        deleteView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BoardDetailAcitivity.this, PopupActivity.class);
+                startActivityForResult(intent, 1);
+            }
+        });
         BoardKey = getIntent().getStringExtra(EXTRA_BOARD_KEY);
+        nickname_ = getIntent().getStringExtra(NICKNAME);
+        //com_nick = getIntent().getStringExtra(COMMENTNICKNAME);
         if (BoardKey == null){
             try {
                 throw new IllegalAccessException("EXTRA_BOARD_KEY is null");
@@ -103,6 +128,49 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                //데이터 받기
+                String result = data.getStringExtra("result");
+                if(result.equals("Delete")){
+                    //글 삭제
+                    //nickname_  =  게시글 작성자 닉네임
+                    //nick = 현재사용자 닉네임
+                    if(nickname_.equals(nick)){
+                        deleteReference = database.getReference("board");
+                        deleteReference.child(BoardKey).removeValue();
+                        finish();
+                        startActivity(new Intent(BoardDetailAcitivity.this,BoardActivity.class));
+
+                    }
+                }
+            }
+        }
+        if(requestCode==2){
+            if(resultCode==RESULT_OK){
+                //데이터받기
+                //com_nick = 댓글 작성자 닉네임
+                //nick 현재 사용자 닉네임
+                String result = data.getStringExtra("result");
+                if(result.equals("Delete")){
+                    //댓글삭제
+                    if(com_nick.equals(nick)){
+                        comdelReference = database.getReference("board/"+BoardKey+"/comment/");
+                        comdelReference.child(CommentKey).removeValue();
+                        finish();
+                        Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
+                        intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname_);
+                        intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,BoardKey);
+                        startActivity(intent);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -135,6 +203,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         String nickname = email[0];
         int goodCount = 0;
         int badCount = 0;
+        String comkey;
         //comment가 비었는지 아닌지를 체크 한다.
 
         if(TextUtils.isEmpty(comment_)){
@@ -142,11 +211,12 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
             return;
         }
 
-        SimpleDateFormat dateform = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateform = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date date = new Date();
         commentReference = FirebaseDatabase.getInstance().getReference();
         String key = commentReference.child("board").child(BoardKey).child("comment").push().getKey();
-        Comment comment=new Comment(nickname,comment_,dateform.format(date).toString(),goodCount,badCount);
+        comkey=key;
+        Comment comment=new Comment(nickname,comment_,dateform.format(date).toString(),goodCount,badCount,comkey);
         Map<String, Object> boardValues = comment.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/board/"+BoardKey+"/comment/"+key,boardValues);
@@ -155,6 +225,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         finish();
         Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
         intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,BoardKey);
+        intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname_);
         startActivity(intent);
     }
 
@@ -175,5 +246,67 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
             writeComment();
         }
 
+    }
+    public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder>{
+        private ArrayList<Comment> arrayList;
+        private Context context;
+
+        public CommentAdapter(ArrayList<Comment> arrayList, Context context) {
+            this.arrayList = arrayList;
+            this.context = context;
+        }
+        @NonNull
+        @Override
+        public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment,parent,false);
+            CommentViewHolder holder = new CommentViewHolder(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull final CommentViewHolder holder, int position) {
+            holder.comment.setText(arrayList.get(position).getComment());
+            holder.nickname.setText(arrayList.get(position).getNickname());
+            holder.date.setText(arrayList.get(position).getDate());
+            holder.goodcount.setText(String.valueOf(arrayList.get(position).getGoodcount()));
+            holder.badcount.setText(String.valueOf(arrayList.get(position).getBadcount()));
+            holder.delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int itemposition = holder.getAdapterPosition();
+                    String nickname=arrayList.get(itemposition).nickname;
+                    CommentKey=arrayList.get(itemposition).comkey;
+                    com_nick=nickname;
+                    Intent intent = new Intent(BoardDetailAcitivity.this, PopupActivity.class);
+                    startActivityForResult(intent, 2);
+                }
+            });
+
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return (arrayList != null ? arrayList.size() : 0);
+        }
+
+        public class CommentViewHolder extends RecyclerView.ViewHolder {
+            TextView delete;
+            TextView comment;
+            TextView nickname;
+            TextView date;
+            TextView goodcount;
+            TextView badcount;
+
+            public CommentViewHolder(@NonNull View itemView) {
+                super(itemView);
+                this.comment=itemView.findViewById(R.id.comment);
+                this.nickname=itemView.findViewById(R.id.nickname);
+                this.date=itemView.findViewById(R.id.date);
+                this.goodcount=itemView.findViewById(R.id.goodcount);
+                this.badcount=itemView.findViewById(R.id.badcount);
+                this.delete=itemView.findViewById(R.id.delete);
+            }
+        }
     }
 }

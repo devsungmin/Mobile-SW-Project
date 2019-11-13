@@ -134,10 +134,11 @@ public class BoardActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int itemposition = holder.getAdapterPosition();
-                    holder.title.getText();
                     String board_key=arrayList.get(itemposition).b_key;
+                    String nickname=arrayList.get(itemposition).nickname;
                     Intent intent = new Intent(BoardActivity.this,BoardDetailAcitivity.class);
                     intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,board_key);
+                    intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname);
                     startActivity(intent);
 
 
