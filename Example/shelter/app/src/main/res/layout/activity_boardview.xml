@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/back"
+        android:layout_width="43dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:text="\u00a0\u00a0\u003C"
+        android:textSize="40dp" />
 
     <TextView
         android:id="@+id/delete"
@@ -40,13 +50,30 @@
             android:layout_margin="15dp"
             android:textSize="10dp"
             android:id="@+id/date"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ib_good"
+            app:srcCompat="@drawable/offgood" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="count"
+            android:text="0"
             android:layout_margin="15dp"
             android:textSize="10dp"
             android:id="@+id/goodcount"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ib_bad"
+            app:srcCompat="@drawable/ofbad" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:layout_margin="15dp"
+            android:text="0"
+            android:id="@+id/badcount"/>
     </LinearLayout>
     <TextView
         android:layout_width="wrap_content"

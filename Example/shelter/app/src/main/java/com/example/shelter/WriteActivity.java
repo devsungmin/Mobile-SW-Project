@@ -66,6 +66,7 @@ public class WriteActivity extends Activity implements View.OnClickListener{
         String nickname = email[0];
         String b_key;
         int goodCount = 0;
+        int badCount=0;
         //title과 content가 비었는지 아닌지를 체크 한다.
         if(TextUtils.isEmpty(title)){
             Toast.makeText(this, "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
@@ -85,7 +86,7 @@ public class WriteActivity extends Activity implements View.OnClickListener{
         mDatabase = FirebaseDatabase.getInstance().getReference();
         String key = mDatabase.child("board").push().getKey();
         b_key=key;
-        Board board=new Board(title,dateform.format(date).toString(),content,nickname,goodCount,b_key);
+        Board board=new Board(title,dateform.format(date).toString(),content,nickname,goodCount,b_key,badCount);
         Map<String, Object> boardValues = board.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/board/"+key,boardValues);
