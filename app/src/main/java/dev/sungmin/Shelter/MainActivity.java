@@ -3,7 +3,6 @@ package dev.sungmin.Shelter;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +22,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.location.Location;
 import android.widget.Toast;
-
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapPolyLine;
@@ -31,7 +29,6 @@ import com.skt.Tmap.TMapTapi;
 import com.skt.Tmap.TMapView;
 import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPoint;
-
 import java.util.ArrayList;
 
 import static android.graphics.Color.RED;
@@ -44,10 +41,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
     private Location lastKnownLocation = null;
-    private static String TMapAPIKey = "api키";
+    private static String TMapAPIKey = "API키";
     private double longitude, latitude, longitude2, latitude2;
     private  String tmapid;
-
 
     /* 메뉴 바 */
     @Override
@@ -85,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
         // 안드로이드 6.0 이상일 경우 퍼미션 체크
         if (Build.VERSION.SDK_INT >= 23) {
-            //checkPermissions();
+            checkPermissions();
         }
 
         LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.linearLayoutTmap);
@@ -95,14 +91,14 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         tMapView.setSKTMapApiKey(TMapAPIKey);
         linearLayoutTmap.addView(tMapView);
 
-        setUpMap();
+
         Button navi = findViewById(R.id.navi);
         navi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                TMapPoint tMapPointStart = new TMapPoint(latitude, longitude); // SKT타워(출발지)
-                TMapPoint tMapPointEnd = new TMapPoint(latitude2, longitude2); // N서울타워(목적지)
+                TMapPoint tMapPointStart = new TMapPoint(latitude, longitude);
+                TMapPoint tMapPointEnd = new TMapPoint(latitude2, longitude2);
                 try {
                     TMapPolyLine tMapPolyLine = new TMapData().findPathData(tMapPointStart, tMapPointEnd);
                     tMapPolyLine.setLineColor(RED);
@@ -112,10 +108,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
         });
+
         Button tmapnavi =findViewById(R.id.tmapnavi);
         tmapnavi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 TMapTapi tMapTapi = new TMapTapi( MainActivity.this);
                 boolean isTmapApp = tMapTapi.isTmapApplicationInstalled();
                 if(isTmapApp) {
-                    System.out.println((float) latitude2+","+(float) longitude2);
                     tMapTapi.invokeRoute(tmapid,(float) longitude2,(float) latitude2);
                     tMapTapi.invokeTmap();
                 }
@@ -135,6 +129,15 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 }
             }
         });
+
+        Button fineApi = findViewById(R.id.findApi);
+        fineApi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setUpMap();
+            }
+        });
+
         /*현재 보는 방향으로 설정*/
         tMapView.setCompassMode(true);
 
@@ -184,10 +187,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     }
 
     private void setUpMap() {
-        ShelterApi parser = new ShelterApi();
+        ShelterApi parser = new ShelterApi(latitude,longitude);
         ArrayList<MapPoint> mapPoint = new ArrayList<MapPoint>();
         try {
-            mapPoint = parser.apiParserSearch();
+            mapPoint = parser.apiParserSearch(latitude,longitude);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -205,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 markerItem1.setCalloutTitle(mapPoint.get(i).getName());
                 markerItem1.setCalloutSubTitle(mapPoint.get(i).getSisul_rddr());
 
-                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.point);           // 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
-                Bitmap b = bitmapdraw.getBitmap();                                                                    // 비트맵 선언
+                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.point);// 그림을  비트맵형식으로 변환 하기위해 bitmapdraw 에 바인딩
+                Bitmap b = bitmapdraw.getBitmap(); // 비트맵 선언
                 Bitmap smallMarker = Bitmap.createScaledBitmap(b, 70, 70, false);
 
 
@@ -236,6 +239,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         }
     }
 
+
+    // 현재 위치 가져오는 코드
     public LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {

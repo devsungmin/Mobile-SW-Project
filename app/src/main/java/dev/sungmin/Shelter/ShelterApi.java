@@ -8,17 +8,17 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class ShelterApi {
-    private static String ServiceKey = "APIKEY";
-    public ShelterApi() {
+    private static String ServiceKey = "API키";
+    public ShelterApi(double latitude_1, double longitude_1) {
         try {
-            apiParserSearch();
+            apiParserSearch(latitude_1,longitude_1);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public ArrayList<MapPoint> apiParserSearch() throws Exception {
+    public ArrayList<MapPoint> apiParserSearch(double latitude_1, double longitude_1) throws Exception {
         URL url = new URL(getURLParam(null));
 
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -69,19 +69,22 @@ public class ShelterApi {
                     blongitude = false;
                 } else  if(bb_addr_cd == true) {
                     b_addr_cd = xpp.getText();
-                    System.out.println(b_addr_cd);
                     bb_addr_cd = false;
                 }
             } else if (event_type == XmlPullParser.END_TAG) {
                 tag = xpp.getName();
-                if (tag.equals("row")) {
-                    MapPoint entity = new MapPoint();
-                    entity.setName(facility_name);
-                    entity.setSisul_rddr(sisul_rddr);
-                    entity.setLatitude(Double.valueOf(latitude));
-                    entity.setLongitude(Double.valueOf(longitude));
-                    entity.setBAddrCd(Double.valueOf(b_addr_cd));
-                    mapPoint.add(entity);
+                if (latitude != null) {
+                    if ((latitude_1 + 0.05 >= Double.valueOf(latitude) && latitude_1 - 0.05 <= Double.valueOf(latitude) && (longitude_1 + 0.05 >= Double.valueOf(longitude) && longitude_1 - 0.05<= Double.valueOf(longitude)))) {
+                        if (tag.equals("row")) {
+                            MapPoint entity = new MapPoint();
+                            entity.setName(facility_name);
+                            entity.setSisul_rddr(sisul_rddr);
+                            entity.setLatitude(Double.valueOf(latitude));
+                            entity.setLongitude(Double.valueOf(longitude));
+                            entity.setBAddrCd(Double.valueOf(b_addr_cd));
+                            mapPoint.add(entity);
+                        }
+                    }
                 }
             }
             event_type = xpp.next();
@@ -91,11 +94,9 @@ public class ShelterApi {
     }
 
     private String getURLParam(String search){
-        String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=100&flag=Y";
+            String url = "http://apis.data.go.kr/1741000/CivilDefenseShelter2/getCivilDefenseShelterList?ServiceKey=" + ServiceKey + "&type=xml&pageNo=1&numOfRows=500&flag=Y";
         return url;
     }
 
-    public static void main(String[] args) {
-        new ShelterApi();
-    }
+
 }
