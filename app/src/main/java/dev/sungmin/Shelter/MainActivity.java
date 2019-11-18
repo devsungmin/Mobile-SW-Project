@@ -226,6 +226,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
+            case R.id.action_btn0:
+                //지도 보기
+                return true;
             case R.id.action_btn1:
                 //게시판
                 finish();
