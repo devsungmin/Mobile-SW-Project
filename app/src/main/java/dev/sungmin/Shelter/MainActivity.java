@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.location.Location;
 import android.widget.Toast;
@@ -92,11 +93,10 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         linearLayoutTmap.addView(tMapView);
 
 
-        Button navi = findViewById(R.id.navi);
+        final ImageButton navi = findViewById(R.id.navi);
         navi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 TMapPoint tMapPointStart = new TMapPoint(latitude, longitude);
                 TMapPoint tMapPointEnd = new TMapPoint(latitude2, longitude2);
                 try {
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
         });
 
-        Button tmapnavi =findViewById(R.id.tmapnavi);
+        final ImageButton tmapnavi =findViewById(R.id.tmapnavi);
         tmapnavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,14 +130,13 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
             }
         });
 
-        Button fineApi = findViewById(R.id.findApi);
+        ImageButton fineApi = findViewById(R.id.findApi);
         fineApi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setUpMap();
             }
         });
-
         /*현재 보는 방향으로 설정*/
         tMapView.setCompassMode(true);
 
