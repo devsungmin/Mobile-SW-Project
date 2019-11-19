@@ -228,6 +228,8 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         switch (item.getItemId()) {
             case R.id.action_btn0:
                 //지도 보기
+                finish();
+                startActivity(new Intent(MainActivity.this,MainActivity.class));
                 return true;
             case R.id.action_btn1:
                 //게시판
@@ -236,6 +238,11 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 return true;
             case R.id.action_btn2:
                 //개발자
+                startActivity(new Intent(MainActivity.this,infomationActivity.class));
+                return true;
+            case R.id.login:
+                finish();
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

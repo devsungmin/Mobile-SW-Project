@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,6 +115,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         if(view == textviewFindPassword) {
             startActivity(new Intent(this, FindActivity.class));
+        }
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_btn0:
+                //지도 보기
+                finish();
+                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                return true;
+            case R.id.action_btn1:
+                //게시판
+                finish();
+                startActivity(new Intent(LoginActivity.this,BoardActivity.class));
+                return true;
+            case R.id.action_btn2:
+                //개발자
+                startActivity(new Intent(LoginActivity.this,infomationActivity.class));
+                return true;
+            case R.id.login:
+                finish();
+                startActivity(new Intent(LoginActivity.this,LoginActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

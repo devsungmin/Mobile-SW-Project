@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -73,6 +74,31 @@ public class FindActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     });
 
+        }
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_btn0:
+                //지도 보기
+                finish();
+                startActivity(new Intent(FindActivity.this,MainActivity.class));
+                return true;
+            case R.id.action_btn1:
+                //게시판
+                finish();
+                startActivity(new Intent(FindActivity.this,BoardActivity.class));
+                return true;
+            case R.id.action_btn2:
+                //개발자
+                startActivity(new Intent(FindActivity.this,infomationActivity.class));
+                return true;
+            case R.id.login:
+                finish();
+                startActivity(new Intent(FindActivity.this,LoginActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

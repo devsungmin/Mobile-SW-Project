@@ -33,6 +33,7 @@
         <activity android:name=".WriteActivity"/>
         <activity android:name=".BoardActivity"/>
         <activity android:name=".BoardDetailAcitivity" />
+        <activity android:name=".infomationActivity"/>
         <activity android:name=".PopupActivity" android:theme="@android:style/Theme.Dialog" />
     </application>
 

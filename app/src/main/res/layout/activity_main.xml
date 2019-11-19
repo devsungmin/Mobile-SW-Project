@@ -10,30 +10,35 @@
       <LinearLayout
           android:id="@+id/linearLayoutTmap"
           android:layout_width="match_parent"
-          android:layout_height="400dp"
+          android:layout_height="0dp"
+          android:layout_weight="11"
           android:orientation="vertical"></LinearLayout>
       <LinearLayout
           android:layout_width="match_parent"
-          android:layout_height="wrap_content"
+          android:layout_height="0dp"
+          android:layout_weight="1"
           android:orientation="horizontal">
 
          <Button
              android:id="@+id/findApi"
-             android:layout_width="120dp"
+             android:layout_width="wrap_content"
              android:layout_height="match_parent"
+             android:layout_weight="1"
              android:text="대피소 찾기"/>
 
          <Button
              android:id="@+id/navi"
-             android:layout_width="120dp"
+             android:layout_width="wrap_content"
              android:layout_height="match_parent"
              android:layout_gravity="bottom"
+             android:layout_weight="1"
              android:text="길 찾기" />
 
          <Button
              android:id="@+id/tmapnavi"
-             android:layout_width="120dp"
+             android:layout_width="wrap_content"
              android:layout_height="match_parent"
+             android:layout_weight="1"
              android:text="경로안내" />
       </LinearLayout>
    </android.widget.LinearLayout>

@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/back"
+        android:layout_width="43dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:text="\u00a0\u00a0\u003C"
+        android:textSize="40dp" />
 
     <TextView
         android:id="@+id/delete"
@@ -22,12 +32,13 @@
         android:layout_margin="15dp"
         android:textSize="20dp"/>
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:text="닉네임"
             android:layout_margin="15dp"
             android:id="@+id/nickname"
@@ -40,13 +51,32 @@
             android:layout_margin="15dp"
             android:textSize="10dp"
             android:id="@+id/date"/>
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/ib_good"
+            app:srcCompat="@drawable/offgood" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="count"
+            android:text="0"
             android:layout_margin="15dp"
             android:textSize="10dp"
             android:id="@+id/goodcount"/>
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/ib_bad"
+            app:srcCompat="@drawable/ofbad" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:layout_margin="15dp"
+            android:text="0"
+            android:id="@+id/badcount"/>
     </LinearLayout>
     <TextView
         android:layout_width="wrap_content"
@@ -57,18 +87,20 @@
         android:id="@+id/content"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/ed_comment"
-            android:layout_width="266dp"
+            android:layout_width="0dp"
+            android:layout_weight="10"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
             android:hint="댓글을 입력하세요." />
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
             android:text="작성"

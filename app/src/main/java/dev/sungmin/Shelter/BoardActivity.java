@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,13 +18,17 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BoardActivity extends Activity {
     private Button button1,button2;
@@ -34,17 +38,12 @@ public class BoardActivity extends Activity {
     private ArrayList<Board> arrayList;
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
+    private static final String TAG = "BoardActivity";
 
 
 
 
-    /* 메뉴 바 */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
 
-        return true;
-    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -58,7 +57,7 @@ public class BoardActivity extends Activity {
             @Override
             public void onClick(View v) {
                 finish();
-                startActivity(new Intent(BoardActivity.this,HomeActivity.class));
+                startActivity(new Intent(BoardActivity.this,MainActivity.class));
             }
         });
         button2.setOnClickListener(new View.OnClickListener() {
@@ -138,13 +137,16 @@ public class BoardActivity extends Activity {
             holder.content.setText(arrayList.get(position).getContent());
             holder.date.setText(arrayList.get(position).getDate());
             holder.goodcount.setText(String.valueOf(arrayList.get(position).getGoodCount()));
+            holder.badcount.setText(String.valueOf(arrayList.get(position).getBadCount()));
+            holder.ib_good.setImageResource(R.drawable.ongood);
+            holder.ib_bad.setImageResource(R.drawable.onbad);
             holder.Mview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int itemposition = holder.getAdapterPosition();
-                    holder.title.getText();
                     String board_key=arrayList.get(itemposition).b_key;
                     String nickname=arrayList.get(itemposition).nickname;
+                    finish();
                     Intent intent = new Intent(BoardActivity.this,BoardDetailAcitivity.class);
                     intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,board_key);
                     intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname);
@@ -167,22 +169,26 @@ public class BoardActivity extends Activity {
 
         public class BoardViewHolder extends RecyclerView.ViewHolder {
             View Mview;
-            //ImageView iv_good;
+            ImageView ib_good;
+            ImageView ib_bad;
             TextView title;
             TextView content;
             TextView date;
             TextView goodcount;
+            TextView badcount;
             TextView nickname;
 
             public BoardViewHolder(@NonNull View itemView) {
                 super(itemView);
                 Mview=itemView;
 
-                //this.iv_good = itemView.findViewById(R.id.iv_good);
+                this.ib_bad=itemView.findViewById(R.id.ib_bad);
+                this.ib_good = itemView.findViewById(R.id.ib_good);
                 this.content = itemView.findViewById(R.id.content);
                 this.title = itemView.findViewById(R.id.title);
                 this.nickname = itemView.findViewById(R.id.nickname);
                 this.goodcount = itemView.findViewById(R.id.goodcount);
+                this.badcount = itemView.findViewById(R.id.badcount);
                 this.date = itemView.findViewById(R.id.date);
 
 
@@ -191,6 +197,9 @@ public class BoardActivity extends Activity {
 
         }
 
+
+
     }
+
 }
 

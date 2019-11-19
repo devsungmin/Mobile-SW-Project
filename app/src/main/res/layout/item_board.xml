@@ -13,17 +13,21 @@
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_margin="5dp"
             android:text="제목"
             android:textSize="20dp" />
 
+
         <TextView
             android:id="@+id/content"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_margin="5dp"
             android:text="내용" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,22 +48,33 @@
                 android:layout_margin="5dp"
                 android:text="시간" />
 
-            <TextView
-                android:layout_width="114dp"
-                android:layout_height="match_parent" />
-
             <ImageView
-                android:id="@+id/iv_good"
-                android:layout_width="wrap_content"
+                android:id="@+id/ib_good"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_on"/>
+                app:srcCompat="@drawable/offgood" />
 
             <TextView
                 android:id="@+id/goodcount"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:text="0" />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_bad"
+                app:srcCompat="@drawable/ofbad" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="0"
+                android:id="@+id/badcount"/>
 
 
         </LinearLayout>

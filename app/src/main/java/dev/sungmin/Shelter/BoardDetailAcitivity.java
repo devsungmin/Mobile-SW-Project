@@ -3,15 +3,17 @@ package dev.sungmin.Shelter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +28,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BoardDetailAcitivity extends Activity implements View.OnClickListener{
@@ -49,19 +54,15 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
     private ValueEventListener mboardListener;
     private FirebaseDatabase database;
     private DatabaseReference boardReference,commentReference,deleteReference,comdelReference;
-    private TextView titleView,contentView,dateView,nicknameView,goodcountView,deleteView;
+    private TextView titleView,contentView,dateView,nicknameView,goodcountView,deleteView,backView,badcountView;
     private EditText commentView;
     private Button button;
+    private ImageButton good,bad;
     String CommentKey;
     String BoardKey;
+    boolean goodimage_bool = false;
+    boolean badimage_bool = false;
 
-    /* 메뉴 바 */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-
-        return true;
-    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +76,31 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         nicknameView = findViewById(R.id.nickname);
         goodcountView = findViewById(R.id.goodcount);
         deleteView = findViewById(R.id.delete);
+        backView=findViewById(R.id.back);
+        badcountView=findViewById(R.id.badcount);
+        good=findViewById(R.id.ib_good);
+        bad=findViewById(R.id.ib_bad);
+        good.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference global = database.getReference("board/"+BoardKey);
+                onBoardGoodClicked(global);
+            }
+        });
+        bad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference global = database.getReference("board/"+BoardKey);
+                onBoardBadClicked(global);
+            }
+        });
+        backView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(new Intent(BoardDetailAcitivity.this, BoardActivity.class));
+            }
+        });
         firebaseAuth = FirebaseAuth.getInstance();
         //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
         if(firebaseAuth.getCurrentUser() == null) {
@@ -104,24 +130,39 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         }
         database=FirebaseDatabase.getInstance();
         boardReference = database.getReference().child("board").child(BoardKey);
-
         CommentAdapter commentAdapter = new CommentAdapter(arrayList,this);
         recyclerView = findViewById(R.id.comment);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         arrayList = new ArrayList<>();
+        boardReference = database.getReference("board/"+BoardKey);
 
-        commentReference = database.getReference("board/"+BoardKey+"/comment");
+        //commentReference = database.getReference("board/"+BoardKey+"/comment");
+        commentReference = database.getReference("comment");
         commentReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //파이어 베이스 데이터베이스의 데이터를 받아오는 곳
                 arrayList.clear();
+
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     //반복문으로 데이터리스트 추출함
                     Comment comment = snapshot.getValue(Comment.class); //만들어뒀던 객체에 데이터를 담는다
                     arrayList.add(comment);
+                    if(comment.good.containsKey(getUid())){
+                        goodimage_bool=true;
+                    }
+                    else{
+                        goodimage_bool=false;
+                    }
+                    if(comment.bad.containsKey(getUid())){
+                        badimage_bool=true;
+                    }
+                    else{
+                        badimage_bool=false;
+                    }
                 }
                 adapter.notifyDataSetChanged(); //리스트 저장 및 새로고침
             }
@@ -166,7 +207,8 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                 if(result.equals("Delete")){
                     //댓글삭제
                     if(com_nick.equals(nick)){
-                        comdelReference = database.getReference("board/"+BoardKey+"/comment/");
+                        //comdelReference = database.getReference("board/"+BoardKey+"/comment/");
+                        comdelReference = database.getReference("comment/");
                         comdelReference.child(CommentKey).removeValue();
                         finish();
                         Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
@@ -193,6 +235,20 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                 nicknameView.setText(board.nickname);
                 dateView.setText(board.date);
                 goodcountView.setText(String.valueOf(board.goodCount));
+                badcountView.setText(String.valueOf(board.badCount));
+                if(board.good.containsKey(getUid())){
+                    good.setImageResource(R.drawable.ongood);
+                }
+                else {
+                    good.setImageResource(R.drawable.offgood);
+                }
+                if(board.bad.containsKey(getUid())){
+                    bad.setImageResource(R.drawable.onbad);
+                }
+                else{
+                    bad.setImageResource(R.drawable.ofbad);
+                }
+
             }
 
             @Override
@@ -223,12 +279,15 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         SimpleDateFormat dateform = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date date = new Date();
         commentReference = FirebaseDatabase.getInstance().getReference();
-        String key = commentReference.child("board").child(BoardKey).child("comment").push().getKey();
+        //String key = commentReference.child("board").child(BoardKey).child("comment").push().getKey();
+        String key = commentReference.child("comment").push().getKey();
         comkey=key;
-        Comment comment=new Comment(nickname,comment_,dateform.format(date).toString(),goodCount,badCount,comkey);
+        String borkey=BoardKey;
+        Comment comment=new Comment(nickname,comment_,dateform.format(date).toString(),goodCount,badCount,comkey,borkey);
         Map<String, Object> boardValues = comment.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/board/"+BoardKey+"/comment/"+key,boardValues);
+        //childUpdates.put("/board/"+BoardKey+"/comment/"+key,boardValues);
+        childUpdates.put("/comment/"+key,boardValues);
         commentReference.updateChildren(childUpdates);
         Toast.makeText(this,"댓글을 작성했습니다.",Toast.LENGTH_SHORT).show();
         finish();
@@ -236,6 +295,72 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,BoardKey);
         intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname_);
         startActivity(intent);
+    }
+    // [START post_stars_transaction]
+    private void onBoardGoodClicked(DatabaseReference postRef) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Board board = mutableData.getValue(Board.class);
+                if (board == null) {
+                    return Transaction.success(mutableData);
+                }
+
+                if (board.good.containsKey(getUid())) {
+                    // Unstar the post and remove self from stars
+                    board.goodCount = board.goodCount - 1;
+                    board.good.remove(getUid());
+                } else {
+                    // Star the post and add self to stars
+                    board.goodCount = board.goodCount + 1;
+                    board.good.put(getUid(), true);
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(board);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
+    }
+    // [END post_stars_transaction]
+    private void onBoardBadClicked(DatabaseReference postRef) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Board board = mutableData.getValue(Board.class);
+                if (board == null) {
+                    return Transaction.success(mutableData);
+                }
+
+                if (board.bad.containsKey(getUid())) {
+                    // Unstar the post and remove self from stars
+                    board.badCount = board.badCount - 1;
+                    board.bad.remove(getUid());
+                } else {
+                    // Star the post and add self to stars
+                    board.badCount = board.badCount + 1;
+                    board.bad.put(getUid(), true);
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(board);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
     }
 
     @Override
@@ -273,7 +398,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         }
 
         @Override
-        public void onBindViewHolder(@NonNull final CommentViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final CommentViewHolder holder, final int position) {
             holder.comment.setText(arrayList.get(position).getComment());
             holder.nickname.setText(arrayList.get(position).getNickname());
             holder.date.setText(arrayList.get(position).getDate());
@@ -288,6 +413,51 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                     com_nick=nickname;
                     Intent intent = new Intent(BoardDetailAcitivity.this, PopupActivity.class);
                     startActivityForResult(intent, 2);
+                }
+            });
+            if(badimage_bool==false){
+                holder.badbutton.setImageResource(R.drawable.ofbad);
+            }
+            else {
+                holder.badbutton.setImageResource(R.drawable.onbad);
+            }
+            if (goodimage_bool==false) {
+
+                holder.goodbutton.setImageResource(R.drawable.offgood);
+
+            }else {
+
+                holder.goodbutton.setImageResource(R.drawable.ongood);
+            }
+
+            holder.goodbutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int ItemPosition = holder.getAdapterPosition();
+                    CommentKey=arrayList.get(ItemPosition).comkey;
+                    //DatabaseReference global = database.getReference("board/"+BoardKey+"/comment/"+CommentKey);
+                    DatabaseReference global = database.getReference("comment/"+CommentKey);
+                    onGoodClicked(global);
+                    finish();
+                    Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
+                    intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,BoardKey);
+                    intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname_);
+                    startActivity(intent);
+                }
+            });
+            holder.badbutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int ItemPosition = holder.getAdapterPosition();
+                    CommentKey=arrayList.get(ItemPosition).comkey;
+                    //DatabaseReference global = database.getReference("board/"+BoardKey+"/comment/"+CommentKey);
+                    DatabaseReference global = database.getReference("comment/"+CommentKey);
+                    onBadClicked(global);
+                    finish();
+                    Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
+                    intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,BoardKey);
+                    intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname_);
+                    startActivity(intent);
                 }
             });
 
@@ -306,6 +476,9 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
             TextView date;
             TextView goodcount;
             TextView badcount;
+            ImageView imageView;
+            ImageView goodbutton;
+            ImageView badbutton;
 
             public CommentViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -315,8 +488,81 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                 this.goodcount=itemView.findViewById(R.id.goodcount);
                 this.badcount=itemView.findViewById(R.id.badcount);
                 this.delete=itemView.findViewById(R.id.delete);
+                this.goodbutton=itemView.findViewById(R.id.iv_good);
+                this.badbutton=itemView.findViewById(R.id.iv_bad);
             }
         }
+        // [START post_stars_transaction]
+        private void onGoodClicked(DatabaseReference postRef) {
+            postRef.runTransaction(new Transaction.Handler() {
+                @Override
+                public Transaction.Result doTransaction(MutableData mutableData) {
+                    Comment comment = mutableData.getValue(Comment.class);
+                    if (comment == null) {
+                        return Transaction.success(mutableData);
+                    }
 
+                    if (comment.good.containsKey(getUid())) {
+                        // Unstar the post and remove self from stars
+                        comment.goodcount = comment.goodcount - 1;
+                        comment.good.remove(getUid());
+                        goodimage_bool=false;
+                    } else {
+                        // Star the post and add self to stars
+                        comment.goodcount = comment.goodcount + 1;
+                        comment.good.put(getUid(), true);
+                        goodimage_bool=true;
+                    }
+
+                    // Set value and report transaction success
+                    mutableData.setValue(comment);
+                    return Transaction.success(mutableData);
+                }
+
+                @Override
+                public void onComplete(DatabaseError databaseError, boolean b,
+                                       DataSnapshot dataSnapshot) {
+                    // Transaction completed
+                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                }
+            });
+        }
+        // [END post_stars_transaction]
+        private void onBadClicked(DatabaseReference postRef) {
+            postRef.runTransaction(new Transaction.Handler() {
+                @Override
+                public Transaction.Result doTransaction(MutableData mutableData) {
+                    Comment comment = mutableData.getValue(Comment.class);
+                    if (comment == null) {
+                        return Transaction.success(mutableData);
+                    }
+
+                    if (comment.bad.containsKey(getUid())) {
+                        // Unstar the post and remove self from stars
+                        comment.badcount = comment.badcount - 1;
+                        comment.bad.remove(getUid());
+                    } else {
+                        // Star the post and add self to stars
+                        comment.badcount = comment.badcount + 1;
+                        comment.bad.put(getUid(), true);
+                    }
+
+                    // Set value and report transaction success
+                    mutableData.setValue(comment);
+                    return Transaction.success(mutableData);
+                }
+
+                @Override
+                public void onComplete(DatabaseError databaseError, boolean b,
+                                       DataSnapshot dataSnapshot) {
+                    // Transaction completed
+                    Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                }
+            });
+        }
+
+    }
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 }

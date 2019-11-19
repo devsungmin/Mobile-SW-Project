@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -113,6 +114,31 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         if(view.getId() == R.id.textViewSignin) {
             //TODO
             startActivity(new Intent(this, LoginActivity.class)); //추가해 줄 로그인 액티비티
+        }
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_btn0:
+                //지도 보기
+                finish();
+                startActivity(new Intent(RegisterActivity.this,MainActivity.class));
+                return true;
+            case R.id.action_btn1:
+                //게시판
+                finish();
+                startActivity(new Intent(RegisterActivity.this,BoardActivity.class));
+                return true;
+            case R.id.action_btn2:
+                //개발자
+                startActivity(new Intent(RegisterActivity.this,infomationActivity.class));
+                return true;
+            case R.id.login:
+                finish();
+                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
