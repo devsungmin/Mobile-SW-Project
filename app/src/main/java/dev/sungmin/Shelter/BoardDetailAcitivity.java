@@ -101,16 +101,20 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                 startActivity(new Intent(BoardDetailAcitivity.this, BoardActivity.class));
             }
         });
-        firebaseAuth = FirebaseAuth.getInstance();
-        //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
-        if(firebaseAuth.getCurrentUser() == null) {
-            finish();
-            startActivity(new Intent(BoardDetailAcitivity.this, LoginActivity.class));
-        }
-        //유저가 있다면, null이 아니면 계속 진행
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        email = user.getEmail().split("@");
-        nick=email[0];
+        try {
+            firebaseAuth = FirebaseAuth.getInstance();
+            //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
+            if (firebaseAuth.getCurrentUser() == null) {
+                finish();
+                startActivity(new Intent(BoardDetailAcitivity.this, LoginActivity.class));
+            }
+            //유저가 있다면, null이 아니면 계속 진행
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            email = user.getEmail().split("@");
+            nick = email[0];
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         deleteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +143,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         boardReference = database.getReference("board/"+BoardKey);
 
         //commentReference = database.getReference("board/"+BoardKey+"/comment");
-        commentReference = database.getReference("comment");
+        commentReference = database.getReference("comment/"+BoardKey);
         commentReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -191,6 +195,8 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                     if(nickname_.equals(nick)){
                         deleteReference = database.getReference("board");
                         deleteReference.child(BoardKey).removeValue();
+                        deleteReference = database.getReference("comment");
+                        deleteReference.child(BoardKey).removeValue();
                         finish();
                         startActivity(new Intent(BoardDetailAcitivity.this,BoardActivity.class));
 
@@ -208,7 +214,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                     //댓글삭제
                     if(com_nick.equals(nick)){
                         //comdelReference = database.getReference("board/"+BoardKey+"/comment/");
-                        comdelReference = database.getReference("comment/");
+                        comdelReference = database.getReference("comment/"+BoardKey+"/");
                         comdelReference.child(CommentKey).removeValue();
                         finish();
                         Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
@@ -229,25 +235,30 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Board board = dataSnapshot.getValue(Board.class);
+                try {
+                    titleView.setText(board.title);
+                    contentView.setText(board.content);
+                    nicknameView.setText(board.nickname);
+                    dateView.setText(board.date);
+                    goodcountView.setText(String.valueOf(board.goodCount));
+                    badcountView.setText(String.valueOf(board.badCount));
+                    if(board.good.containsKey(getUid())){
+                        good.setImageResource(R.drawable.ongood);
+                    }
+                    else {
+                        good.setImageResource(R.drawable.offgood);
+                    }
+                    if(board.bad.containsKey(getUid())){
+                        bad.setImageResource(R.drawable.onbad);
+                    }
+                    else{
+                        bad.setImageResource(R.drawable.ofbad);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                titleView.setText(board.title);
-                contentView.setText(board.content);
-                nicknameView.setText(board.nickname);
-                dateView.setText(board.date);
-                goodcountView.setText(String.valueOf(board.goodCount));
-                badcountView.setText(String.valueOf(board.badCount));
-                if(board.good.containsKey(getUid())){
-                    good.setImageResource(R.drawable.ongood);
-                }
-                else {
-                    good.setImageResource(R.drawable.offgood);
-                }
-                if(board.bad.containsKey(getUid())){
-                    bad.setImageResource(R.drawable.onbad);
-                }
-                else{
-                    bad.setImageResource(R.drawable.ofbad);
-                }
+
 
             }
 
@@ -280,14 +291,14 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
         Date date = new Date();
         commentReference = FirebaseDatabase.getInstance().getReference();
         //String key = commentReference.child("board").child(BoardKey).child("comment").push().getKey();
-        String key = commentReference.child("comment").push().getKey();
+        String key = commentReference.child("comment").child(BoardKey).push().getKey();
         comkey=key;
         String borkey=BoardKey;
         Comment comment=new Comment(nickname,comment_,dateform.format(date).toString(),goodCount,badCount,comkey,borkey);
         Map<String, Object> boardValues = comment.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         //childUpdates.put("/board/"+BoardKey+"/comment/"+key,boardValues);
-        childUpdates.put("/comment/"+key,boardValues);
+        childUpdates.put("/comment/"+borkey+"/"+key,boardValues);
         commentReference.updateChildren(childUpdates);
         Toast.makeText(this,"댓글을 작성했습니다.",Toast.LENGTH_SHORT).show();
         finish();
@@ -436,7 +447,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                     int ItemPosition = holder.getAdapterPosition();
                     CommentKey=arrayList.get(ItemPosition).comkey;
                     //DatabaseReference global = database.getReference("board/"+BoardKey+"/comment/"+CommentKey);
-                    DatabaseReference global = database.getReference("comment/"+CommentKey);
+                    DatabaseReference global = database.getReference("comment/"+BoardKey+"/"+CommentKey);
                     onGoodClicked(global);
                     finish();
                     Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);
@@ -451,7 +462,7 @@ public class BoardDetailAcitivity extends Activity implements View.OnClickListen
                     int ItemPosition = holder.getAdapterPosition();
                     CommentKey=arrayList.get(ItemPosition).comkey;
                     //DatabaseReference global = database.getReference("board/"+BoardKey+"/comment/"+CommentKey);
-                    DatabaseReference global = database.getReference("comment/"+CommentKey);
+                    DatabaseReference global = database.getReference("comment/"+BoardKey+"/"+CommentKey);
                     onBadClicked(global);
                     finish();
                     Intent intent = new Intent(BoardDetailAcitivity.this,BoardDetailAcitivity.class);

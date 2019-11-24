@@ -39,6 +39,9 @@
         <activity
             android:name=".PopupActivity"
             android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".Popup2Activity"
+            android:theme="@android:style/Theme.Dialog" />
     </application>
 
 </manifest>

@@ -36,13 +36,13 @@ import static android.graphics.Color.RED;
 
 
 public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
-
+    public int PageNumber_=1;
     private static final int MY_PERMISSIONS_REQUEST = 1000;
     private boolean TrackingMode = true;
     private TMapView tMapView = null;
     private TMapGpsManager tmapgps = null;
     private Location lastKnownLocation = null;
-    private static String TMapAPIKey = "API키";
+    private static String TMapAPIKey = "API-KEY";
     private double longitude, latitude, longitude2, latitude2;
     private  String tmapid;
 
@@ -134,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         fineApi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setUpMap();
+                Intent intent = new Intent(MainActivity.this, Popup2Activity.class);
+                startActivityForResult(intent, 1);
+
             }
         });
         /*현재 보는 방향으로 설정*/
@@ -166,6 +168,19 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         });
 
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                //데이터 받기
+                String result = data.getStringExtra("result");
+                PageNumber_=Integer.parseInt(result);
+                System.out.println("PAGENUMBER="+PageNumber_);
+                setUpMap();
+            }
+        }
+    }
 
     private boolean checkPermissions() {
         /* 파일 접근 권한 체크 */
@@ -186,10 +201,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     }
 
     private void setUpMap() {
-        ShelterApi parser = new ShelterApi(latitude,longitude);
+        int PageNumber=PageNumber_;
+
+        ShelterApi parser = new ShelterApi(latitude,longitude,PageNumber);
         ArrayList<MapPoint> mapPoint = new ArrayList<MapPoint>();
         try {
-            mapPoint = parser.apiParserSearch(latitude,longitude);
+            mapPoint = parser.apiParserSearch(latitude,longitude,PageNumber);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -218,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 tMapView.addMarkerItem("markerItem1" + i, markerItem1);
             }
         }
+        System.out.println("마커찍기완료");
     }
 
     /* 메뉴바 선택 */

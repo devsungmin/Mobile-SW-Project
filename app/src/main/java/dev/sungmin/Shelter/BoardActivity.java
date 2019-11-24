@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -144,17 +145,27 @@ public class BoardActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int itemposition = holder.getAdapterPosition();
-                    String board_key=arrayList.get(itemposition).b_key;
-                    String nickname=arrayList.get(itemposition).nickname;
-                    finish();
-                    Intent intent = new Intent(BoardActivity.this,BoardDetailAcitivity.class);
-                    intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY,board_key);
-                    intent.putExtra(BoardDetailAcitivity.NICKNAME,nickname);
-                    startActivity(intent);
+                    //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if(user == null) {
+                            finish();
+                            startActivity(new Intent(BoardActivity.this, LoginActivity.class));
+                        }
+                        else {
+                            //유저가 있다면, null이 아니면 계속 진행
+                            //FirebaseUser user = firebaseAuth.getCurrentUser();
+                            String board_key = arrayList.get(itemposition).b_key;
+                            String nickname = arrayList.get(itemposition).nickname;
+                            finish();
+                            Intent intent = new Intent(BoardActivity.this, BoardDetailAcitivity.class);
+                            intent.putExtra(BoardDetailAcitivity.EXTRA_BOARD_KEY, board_key);
+                            intent.putExtra(BoardDetailAcitivity.NICKNAME, nickname);
+                            startActivity(intent);
 
 
+                            //Toast.makeText(BoardActivity.this, "" + board_key, Toast.LENGTH_SHORT).show();
+                        }
 
-                    Toast.makeText(BoardActivity.this,""+board_key,Toast.LENGTH_SHORT).show();
 
 
                 }

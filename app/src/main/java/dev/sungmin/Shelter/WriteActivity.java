@@ -47,15 +47,21 @@ public class WriteActivity extends Activity implements View.OnClickListener{
         progressDialog = new ProgressDialog(this);
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
-        //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
-        if(firebaseAuth.getCurrentUser() == null) {
-            finish();
-            startActivity(new Intent(WriteActivity.this, LoginActivity.class));
+        try{
+            //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
+            if(firebaseAuth.getCurrentUser() == null) {
+                finish();
+                startActivity(new Intent(WriteActivity.this, LoginActivity.class));
+            }
+
+            //유저가 있다면, null이 아니면 계속 진행
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            email = user.getEmail().split("@");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
 
-        //유저가 있다면, null이 아니면 계속 진행
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        email = user.getEmail().split("@");
 
 
     }
